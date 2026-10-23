@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClassHub Pro Workspace — Nền Tảng Học Tập & Thi Đấu Trực Tuyến</title>
+
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind & Icons & Confetti -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              400: 'var(--c-brand-400)',
+              500: 'var(--c-brand-500)',
+              600: 'var(--c-brand-600)',
+              glow: 'var(--c-brand-glow)',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --c-brand-400: #38bdf8;
+      --c-brand-500: #0284c7;
+      --c-brand-600: #0369a1;
+      --c-brand-glow: rgba(56, 189, 248, 0.25);
+    }
+    .theme-aurora {
+      --c-brand-400: #a78bfa;
+      --c-brand-500: #8b5cf6;
+      --c-brand-600: #7c3aed;
+      --c-brand-glow: rgba(167, 139, 250, 0.25);
+    }
+    .theme-sunset {
+      --c-brand-400: #fb923c;
+      --c-brand-500: #f97316;
+      --c-brand-600: #ea580c;
+      --c-brand-glow: rgba(251, 146, 60, 0.25);
+    }
+    .theme-emerald {
+      --c-brand-400: #34d399;
+      --c-brand-500: #10b981;
+      --c-brand-600: #059669;
+      --c-brand-glow: rgba(52, 211, 153, 0.25);
+    }
+    .theme-rose {
+      --c-brand-400: #fb7185;
+      --c-brand-500: #f43f5e;
+      --c-brand-600: #e11d48;
+      --c-brand-glow: rgba(251, 113, 133, 0.25);
+    }
+
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .light .glass-panel {
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .perspective-1000 { perspective: 1200px; }
+    .preserve-3d {
+      transform-style: preserve-3d;
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .preserve-3d.flipped { transform: rotateY(180deg); }
+    .backface-hidden {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .rotate-y-180 { transform: rotateY(180deg); }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.2);
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: var(--c-brand-400); }
+  </style>
+</head>
+
+<body class="bg-slate-950 text-slate-100 min-h-screen flex font-sans selection:bg-brand-500 selection:text-white antialiased transition-colors duration-200">
+
+  <!-- ================= COLLAPSIBLE SIDEBAR ================= -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 glass-panel border-r border-white/10 flex flex-col justify-between transition-transform duration-300 md:translate-x-0 -translate-x-full">
+    
+    <!-- Top Workspace Identity -->
+    <div class="p-4 border-b border-white/10">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div id="sideAvatarBox" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-brand-400 flex items-center justify-center text-white font-extrabold text-sm shadow-md shadow-brand-glow">
+            12A
+          </div>
+          <div class="flex flex-col overflow-hidden">
+            <span id="sideClassName" class="text-sm font-bold text-white truncate">Lớp 12A1 Chuyên</span>
+            <span class="text-[10px] text-brand-400 font-semibold uppercase tracking-wider flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Workspace
+            </span>
+          </div>
+        </div>
+        <button onclick="toggleSidebar()" class="md:hidden p-1.5 text-slate-400 hover:text-white rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Navigation List -->
+    <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 pb-2">Học tập & Ôn luyện</div>
+      
+      <button onclick="switchTab('sets')" class="sidebar-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition" data-tab="sets">
+        <i data-lucide="layers" class="w-4 h-4 text-brand-400"></i>
+        <span>Ngân Hàng Đề & Thẻ</span>
+      </button>
+
+      <button onclick="switchTab('exam')" class="sidebar-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition" data-tab="exam">
+        <i data-lucide="swords" class="w-4 h-4 text-red-400"></i>
+        <span>Đấu Trường Thi Thử</span>
+      </button>
+
+      <button onclick="switchTab('vault')" class="sidebar-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition" data-tab="vault">
+        <i data-lucide="library" class="w-4 h-4 text-emerald-400"></i>
+        <span>Kho Tài Liệu Lớp</span>
+      </button>
+
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 pt-5 pb-2">Hệ thống</div>
+
+      <button onclick="switchTab('members')" id="sideAdminTab" class="sidebar-tab w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition" data-tab="members">
+        <div class="flex items-center gap-3">
+          <i data-lucide="shield-check" class="w-4 h-4 text-amber-400"></i>
+          <span>Quản Trị Lớp Học</span>
+        </div>
+        <span class="text-[10px] font-bold bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded">Owner</span>
+      </button>
+
+      <button onclick="switchTab('settings')" class="sidebar-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition" data-tab="settings">
+        <i data-lucide="sparkles" class="w-4 h-4 text-indigo-400"></i>
+        <span>Cá Nhân Hóa</span>
+      </button>
+    </nav>
+
+    <!-- Bottom User Profile Pill -->
+    <div class="p-3 border-t border-white/10 bg-black/20">
+      <div class="flex items-center justify-between p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 transition">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div id="userAvatarPill" class="w-8 h-8 rounded-lg bg-brand-500 text-white font-extrabold text-xs flex items-center justify-center shrink-0">
+            A
+          </div>
+          <div class="flex flex-col min-w-0">
+            <span id="userNamePill" class="text-xs font-bold text-white truncate max-w-[105px]">Thầy Hùng</span>
+            <span id="userRolePill" class="text-[10px] text-brand-400 font-semibold truncate">Chủ sở hữu</span>
+          </div>
+        </div>
+        <button onclick="openAuthModal()" title="Chuyển / Đổi tài khoản" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-white/10">
+          <i data-lucide="arrow-left-right" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- Mobile Overlay -->
+  <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/70 z-40 hidden md:hidden"></div>
+
+  <!-- ================= RIGHT WORKSPACE CONTENT ================= -->
+  <div class="flex-1 md:pl-64 flex flex-col min-w-0 min-h-screen">
+
+    <!-- Top App Utility Bar -->
+    <header class="sticky top-0 z-30 h-14 glass-panel border-b border-white/10 px-4 sm:px-6 flex items-center justify-between gap-4">
+      
+      <div class="flex items-center gap-3">
+        <button onclick="toggleSidebar()" class="md:hidden p-2 text-slate-400 hover:text-white rounded-xl bg-white/5">
+          <i data-lucide="menu" class="w-4 h-4"></i>
+        </button>
+        <div class="flex items-center gap-2 text-xs">
+          <span class="text-slate-400">ClassHub</span>
+          <span class="text-slate-600">/</span>
+          <span id="breadcrumbCurrent" class="font-bold text-white">Ngân Hàng Đề</span>
+        </div>
+      </div>
+
+      <!-- Quick Stats & Tools -->
+      <div class="flex items-center gap-2.5 sm:gap-3">
+        <!-- Streak Fire -->
+        <div class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-bold" title="Chuỗi ngày hoạt động liên tục">
+          <span>🔥</span>
+          <span id="userStreakCount">7 ngày</span>
+        </div>
+
+        <!-- XP Badge -->
+        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold">
+          <i data-lucide="zap" class="w-3.5 h-3.5 fill-emerald-400"></i>
+          <span id="userXpTotal">1,250 XP</span>
+        </div>
+
+        <!-- Fast Code Creator CTA -->
+        <button onclick="openFastImportModal()" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm hover:opacity-90">
+          <i data-lucide="code-xml" class="w-3.5 h-3.5"></i>
+          <span class="hidden sm:inline">Nhập Đề Bằng Mã Code</span>
+        </button>
+
+        <!-- Sound Toggle -->
+        <button onclick="toggleAudio()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5" title="Bật/Tắt âm thanh">
+          <i data-lucide="volume-2" class="w-4 h-4" id="audioIcon"></i>
+        </button>
+
+        <!-- Dark/Light Theme -->
+        <button onclick="toggleDarkMode()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5" title="Sáng / Tối">
+          <i data-lucide="sun" class="w-4 h-4 hidden dark:block text-amber-400"></i>
+          <i data-lucide="moon" class="w-4 h-4 block dark:hidden text-indigo-500"></i>
+        </button>
+      </div>
+
+    </header>
+
+    <!-- Main Dynamic Content Workspace -->
+    <main class="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto space-y-6">
+
+      <!-- ======================================================== -->
+      <!-- SECTION 1: QUESTION BANK & STUDY (NGÂN HÀNG ĐỀ & THẺ)    -->
+      <!-- ======================================================== -->
+      <section id="tab-sets" class="tab-pane space-y-5">
+        
+        <!-- Filter, Search and View Segmented Controller -->
+        <div class="glass-panel p-3.5 rounded-2xl flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+          
+          <!-- Subject Pills -->
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0" id="subjectFilterPills">
+            <button onclick="filterBySubject('all')" class="sub-pill px-3 py-1.5 rounded-xl text-xs font-bold bg-brand-500 text-white" data-sub="all">Tất Cả</button>
+            <button onclick="filterBySubject('Toán Học')" class="sub-pill px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/5 text-slate-300 hover:bg-white/10" data-sub="Toán Học">Toán Học</button>
+            <button onclick="filterBySubject('Vật Lý')" class="sub-pill px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/5 text-slate-300 hover:bg-white/10" data-sub="Vật Lý">Vật Lý</button>
+            <button onclick="filterBySubject('Hóa Học')" class="sub-pill px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/5 text-slate-300 hover:bg-white/10" data-sub="Hóa Học">Hóa Học</button>
+            <button onclick="filterBySubject('Tiếng Anh')" class="sub-pill px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/5 text-slate-300 hover:bg-white/10" data-sub="Tiếng Anh">Tiếng Anh</button>
+          </div>
+
+          <!-- Search & Segmented Switcher -->
+          <div class="flex items-center gap-2">
+            <div class="relative flex-1 sm:w-64">
+              <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400"></i>
+              <input type="text" id="bankSearchInput" oninput="renderBankCards()" placeholder="Tìm kiếm bộ đề, nội dung..." class="w-full pl-9 pr-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white focus:outline-none focus:border-brand-400">
+            </div>
+
+            <!-- Segmented View Toggle -->
+            <div class="flex items-center p-1 rounded-xl bg-black/40 border border-white/10 text-slate-400">
+              <button onclick="setBankView('grid')" id="viewBtnGrid" class="p-1.5 rounded-lg text-white bg-white/10" title="Dạng Thẻ Đề"><i data-lucide="layout-grid" class="w-3.5 h-3.5"></i></button>
+              <button onclick="setBankView('flashcard')" id="viewBtnFc" class="p-1.5 rounded-lg hover:text-white" title="Chế Độ Flashcard 3D"><i data-lucide="book-open" class="w-3.5 h-3.5"></i></button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Metric strip -->
+        <div class="grid grid-cols-3 gap-3">
+          <div class="glass-panel p-3.5 rounded-2xl flex items-center justify-between">
+            <span class="text-xs text-slate-400">Tổng bộ đề</span>
+            <span id="bankStatSets" class="text-lg font-extrabold text-white">0</span>
+          </div>
+          <div class="glass-panel p-3.5 rounded-2xl flex items-center justify-between">
+            <span class="text-xs text-slate-400">Tổng câu hỏi</span>
+            <span id="bankStatQ" class="text-lg font-extrabold text-brand-400">0</span>
+          </div>
+          <div class="glass-panel p-3.5 rounded-2xl flex items-center justify-between">
+            <span class="text-xs text-slate-400">Có hình minh họa</span>
+            <span id="bankStatImg" class="text-lg font-extrabold text-purple-400">0</span>
+          </div>
+        </div>
+
+        <!-- VIEW A: GRID OF STUDY SETS -->
+        <div id="bankGridView" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Rendered via JS -->
+        </div>
+
+        <!-- VIEW B: DIRECT EMBEDDED FLASHCARD 3D WORKBENCH -->
+        <div id="bankFcView" class="hidden glass-panel p-6 rounded-3xl space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <span id="fcActiveSubjectTag" class="px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase bg-brand-500/20 text-brand-300">Toán Học</span>
+                <h3 id="fcActiveSetTitle" class="text-base font-bold text-white">Hàm Số & Đồ Thị</h3>
+              </div>
+              <p class="text-xs text-slate-400 mt-0.5">Nhấp vào thẻ để lật đáp án & lời giải chi tiết</p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span id="fcCounterBadge" class="text-xs font-mono font-bold text-brand-400 px-3 py-1 rounded-xl bg-white/5 border border-white/10">1 / 5</span>
+              <button onclick="setBankView('grid')" class="px-3 py-1.5 rounded-xl bg-white/5 text-xs font-bold text-slate-300 hover:bg-white/10">Về Danh Sách</button>
+            </div>
+          </div>
+
+          <!-- 3D Card Scene -->
+          <div class="perspective-1000 max-w-2xl mx-auto min-h-[320px] sm:min-h-[360px] w-full cursor-pointer select-none" onclick="flipActiveCard()">
+            <div id="fcBoxInner" class="preserve-3d relative w-full h-full rounded-2xl shadow-xl">
+              
+              <!-- Front -->
+              <div class="backface-hidden absolute inset-0 rounded-2xl p-6 sm:p-8 flex flex-col justify-between bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 border border-brand-500/40 text-white">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-bold text-brand-400 uppercase tracking-wide">Mặt Câu Hỏi</span>
+                  <span class="text-slate-400 text-[11px] flex items-center gap-1"><i data-lucide="rotate-cw" class="w-3 h-3"></i> Chạm để lật</span>
+                </div>
+
+                <div class="my-auto space-y-3 text-center py-2">
+                  <p id="fcBoxQuestion" class="text-sm sm:text-base font-semibold leading-relaxed text-slate-100">
+                    Nội dung câu hỏi...
+                  </p>
+                  <div id="fcBoxImageWrapper" class="hidden flex justify-center py-1">
+                    <img id="fcBoxImage" src="" alt="Hình minh họa" class="max-h-36 rounded-xl border border-white/20 object-contain hover:scale-105 transition" onclick="event.stopPropagation(); zoomImg(this.src)">
+                  </div>
+                </div>
+
+                <div class="text-[11px] text-slate-500 text-center">ClassHub Flashcard Engine</div>
+              </div>
+
+              <!-- Back -->
+              <div class="backface-hidden rotate-y-180 absolute inset-0 rounded-2xl p-6 sm:p-8 flex flex-col justify-between bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 border border-emerald-500/50 text-white">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-bold text-emerald-400 uppercase tracking-wide flex items-center gap-1.5">
+                    <i data-lucide="check-circle" class="w-4 h-4"></i> Đáp Án Đúng
+                  </span>
+                  <span id="fcBoxCorrectChar" class="w-6 h-6 rounded-md bg-emerald-500 text-slate-950 font-black text-xs flex items-center justify-center">A</span>
+                </div>
+
+                <div class="my-auto space-y-2 text-center py-2">
+                  <div id="fcBoxCorrectText" class="text-base sm:text-lg font-black text-emerald-400">
+                    Đáp án đúng
+                  </div>
+                  <div class="p-3 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-300 max-h-28 overflow-y-auto text-left">
+                    <span class="font-bold text-slate-400">Giải thích: </span>
+                    <span id="fcBoxExplain">...</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-between text-[11px] text-slate-400">
+                  <span>Chạm lại để xem câu hỏi</span>
+                  <span class="text-emerald-400 font-bold">+20 XP</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Controls -->
+          <div class="flex items-center justify-center gap-3">
+            <button onclick="prevActiveCard()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white text-xs font-bold flex items-center gap-1.5">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i> Trước
+            </button>
+            <button onclick="markActiveMastered()" class="px-5 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold flex items-center gap-1.5">
+              <i data-lucide="check" class="w-4 h-4"></i> Đã Thuộc
+            </button>
+            <button onclick="nextActiveCard()" class="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold flex items-center gap-1.5">
+              Sau <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- SECTION 2: MOCK EXAM ARENA (ĐẤU TRƯỜNG THI THỬ)         -->
+      <!-- ======================================================== -->
+      <section id="tab-exam" class="tab-pane hidden space-y-6">
+        
+        <!-- LOBBY: Ergonomic 2-Column Balanced Layout -->
+        <div id="examLobbyView" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- Left Column (7 cols): Exam Launchpad -->
+          <div class="lg:col-span-7 glass-panel p-6 sm:p-8 rounded-3xl space-y-6 flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-red-500/20 text-red-400 border border-red-500/30 flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span> Live Testing
+                </span>
+                <span class="text-xs text-slate-400">Chuẩn cấu trúc trắc nghiệm THPT</span>
+              </div>
+              <h2 class="text-xl sm:text-2xl font-black text-white">Đấu Trường Thi Thử Đột Phá</h2>
+              <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                Được thiết kế theo chuẩn phòng thi thực chiến: Tự động đảo câu hỏi, tích hợp ma trận điều hướng nhanh, hỗ trợ câu hỏi có hình minh họa và tự động lưu điểm số vào bảng vàng.
+              </p>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3">
+              <div class="text-xs font-bold text-slate-300">Chọn cấu hình thi:</div>
+              <div class="grid grid-cols-2 gap-3">
+                <button onclick="launchExam(10)" class="p-3.5 rounded-xl border border-brand-500/40 bg-brand-500/10 hover:bg-brand-500/20 text-left transition space-y-1">
+                  <div class="text-xs font-bold text-white flex items-center justify-between">
+                    <span>Đề Chuẩn</span>
+                    <span class="text-brand-400 font-mono text-[11px]">10 Phút</span>
+                  </div>
+                  <div class="text-[11px] text-slate-400">10 câu hỏi tổng hợp ngẫu nhiên</div>
+                </button>
+                <button onclick="launchExam(5)" class="p-3.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-left transition space-y-1">
+                  <div class="text-xs font-bold text-white flex items-center justify-between">
+                    <span>Thử Thách Nhanh</span>
+                    <span class="text-amber-400 font-mono text-[11px]">5 Phút</span>
+                  </div>
+                  <div class="text-[11px] text-slate-400">5 câu hỏi tốc độ phản xạ</div>
+                </button>
+              </div>
+            </div>
+
+            <button onclick="launchExam(10)" class="w-full py-3 rounded-2xl bg-gradient-to-r from-red-500 via-brand-500 to-brand-600 text-white font-extrabold text-xs sm:text-sm shadow-md hover:opacity-95 flex items-center justify-center gap-2 transition">
+              <i data-lucide="play" class="w-4 h-4 fill-white"></i> Bắt Đầu Làm Bài Thi Ngay
+            </button>
+          </div>
+
+          <!-- Right Column (5 cols): Leaderboard & Test History -->
+          <div class="lg:col-span-5 glass-panel p-6 rounded-3xl space-y-4">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+              <div class="flex items-center gap-2">
+                <i data-lucide="trophy" class="w-4 h-4 text-amber-400"></i>
+                <h3 class="text-sm font-bold text-white">Bảng Vinh Danh Điểm Cao</h3>
+              </div>
+              <span class="text-[11px] text-slate-400">Cập nhật tức thì</span>
+            </div>
+
+            <div class="space-y-2 overflow-y-auto max-h-[330px] pr-1" id="examLeaderboardList">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ACTIVE EXAM ROOM: Focused Full Screen Layout -->
+        <div id="examRoomView" class="hidden space-y-4">
+          
+          <!-- Sticky Top Bar -->
+          <div class="sticky top-16 z-20 glass-panel p-3.5 rounded-2xl flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+              <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-red-500/20 text-red-400 border border-red-500/30">Thi Trực Tuyến</span>
+              <span id="activeExamLabel" class="text-xs font-bold text-white truncate max-w-xs">Đề Thi Thử Chuẩn THPT</span>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <div class="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-900 border border-white/10 font-mono text-sm font-bold text-brand-400">
+                <i data-lucide="timer" class="w-4 h-4"></i>
+                <span id="examCountdown">10:00</span>
+              </div>
+              <button onclick="submitExamPrompt()" class="px-4 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 text-white font-extrabold text-xs shadow-md flex items-center gap-1.5">
+                <i data-lucide="send" class="w-3.5 h-3.5"></i> Nộp Bài
+              </button>
+            </div>
+          </div>
+
+          <!-- Exam 2-Column: Question on Left, Matrix on Right -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            
+            <!-- Question Box (8 cols) -->
+            <div class="lg:col-span-8 glass-panel p-6 sm:p-8 rounded-3xl space-y-6">
+              <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <span id="examQCurrentTag" class="text-xs font-black uppercase text-brand-400">Câu hỏi 1 / 10</span>
+                <button onclick="toggleFlagCurrent()" id="btnFlagActive" class="text-xs font-bold px-3 py-1 rounded-lg border border-white/10 text-slate-400 hover:text-white flex items-center gap-1.5">
+                  <i data-lucide="flag" class="w-3.5 h-3.5"></i> <span>Đánh dấu</span>
+                </button>
+              </div>
+
+              <!-- Question text -->
+              <div id="examQText" class="text-sm sm:text-base font-bold text-white leading-relaxed">
+                Nội dung câu hỏi...
+              </div>
+
+              <!-- Question Image -->
+              <div id="examQImageWrap" class="hidden py-1">
+                <img id="examQImage" src="" alt="Hình minh họa bài thi" class="max-h-56 rounded-2xl border border-white/15 object-contain cursor-zoom-in hover:opacity-90 transition" onclick="zoomImg(this.src)">
+              </div>
+
+              <!-- 4 Options -->
+              <div id="examQOptions" class="space-y-2.5 pt-2"></div>
+
+              <!-- Prev / Next Controls -->
+              <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                <button onclick="prevExamQ()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white text-xs font-bold flex items-center gap-1.5">
+                  <i data-lucide="chevron-left" class="w-4 h-4"></i> Câu Trước
+                </button>
+                <button onclick="nextExamQ()" class="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold flex items-center gap-1.5">
+                  Câu Kế Tiếp <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Question Matrix Palette (4 cols) -->
+            <div class="lg:col-span-4 glass-panel p-5 rounded-3xl space-y-3 h-fit">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold uppercase text-slate-300">Ma Trận Câu Hỏi</span>
+                <span id="examQAnsweredCount" class="font-bold text-brand-400">0/10 đã làm</span>
+              </div>
+              <div id="examPaletteGrid" class="grid grid-cols-5 gap-2 pt-1">
+                <!-- Rendered numbers -->
+              </div>
+              <div class="text-[11px] text-slate-400 pt-2 border-t border-white/10 flex items-center justify-around">
+                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-brand-500 inline-block"></span> Đã chọn</span>
+                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-amber-400 inline-block"></span> Đánh dấu</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- EXAM RESULT SUMMARY -->
+        <div id="examScoreView" class="hidden glass-panel p-8 sm:p-12 rounded-3xl max-w-xl mx-auto text-center space-y-6">
+          <div class="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-3xl bg-gradient-to-tr from-brand-500 to-brand-accent text-white shadow-xl">
+            🏆
+          </div>
+          <div class="space-y-1">
+            <h3 class="text-xl sm:text-2xl font-black text-white">Kết Quả Bài Thi Thử</h3>
+            <p class="text-xs text-slate-400">Điểm số đã được tự động lưu vào bảng thành tích của bạn</p>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3 p-4 rounded-2xl bg-white/5 border border-white/10">
+            <div>
+              <div class="text-[11px] text-slate-400 font-bold uppercase">Điểm số</div>
+              <div id="scoreValue" class="text-2xl font-black text-brand-400 mt-0.5">9.0/10</div>
+            </div>
+            <div class="border-x border-white/10">
+              <div class="text-[11px] text-slate-400 font-bold uppercase">Số câu đúng</div>
+              <div id="scoreCorrect" class="text-2xl font-black text-emerald-400 mt-0.5">9/10</div>
+            </div>
+            <div>
+              <div class="text-[11px] text-slate-400 font-bold uppercase">Thời gian</div>
+              <div id="scoreTime" class="text-2xl font-black text-amber-400 mt-0.5">05:40</div>
+            </div>
+          </div>
+
+          <div class="flex justify-center gap-3">
+            <button onclick="exitExamToLobby()" class="px-4 py-2 rounded-xl bg-white/10 text-white text-xs font-bold hover:bg-white/15">Về Sảnh Thi</button>
+            <button onclick="switchTab('sets')" class="px-5 py-2 rounded-xl bg-brand-500 text-white text-xs font-bold hover:bg-brand-600">Ôn Tập Tiếp</button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- SECTION 3: RESOURCE VAULT (KHO TÀI LIỆU LỚP)             -->
+      <!-- ======================================================== -->
+      <section id="tab-vault" class="tab-pane hidden space-y-5">
+        
+        <div class="glass-panel p-4 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div class="relative flex-1">
+            <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400"></i>
+            <input type="text" id="docSearchInput" oninput="renderVaultDocs()" placeholder="Tìm tài liệu theo môn, từ khóa..." class="w-full pl-9 pr-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white focus:outline-none focus:border-brand-400">
+          </div>
+          <button onclick="openUploadDocPrompt()" id="btnUploadVaultDoc" class="px-4 py-1.5 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm">
+            <i data-lucide="upload" class="w-3.5 h-3.5"></i> Thêm Tài Liệu
+          </button>
+        </div>
+
+        <div id="vaultGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Rendered via JS -->
+        </div>
+
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- SECTION 4: MEMBER MANAGEMENT (QUẢN LÝ LỚP - ADMIN)       -->
+      <!-- ======================================================== -->
+      <section id="tab-members" class="tab-pane hidden space-y-5">
+        
+        <!-- Admin Metrics -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="glass-panel p-4 rounded-2xl">
+            <div class="text-[11px] text-slate-400 font-bold uppercase">Tổng thành viên</div>
+            <div id="adminStatMembers" class="text-2xl font-black text-white mt-1">3</div>
+          </div>
+          <div class="glass-panel p-4 rounded-2xl">
+            <div class="text-[11px] text-slate-400 font-bold uppercase">Quản trị viên</div>
+            <div id="adminStatAdmins" class="text-2xl font-black text-amber-400 mt-1">1</div>
+          </div>
+          <div class="glass-panel p-4 rounded-2xl">
+            <div class="text-[11px] text-slate-400 font-bold uppercase">Học sinh</div>
+            <div id="adminStatStudents" class="text-2xl font-black text-brand-400 mt-1">2</div>
+          </div>
+          <div class="glass-panel p-4 rounded-2xl">
+            <div class="text-[11px] text-slate-400 font-bold uppercase">Đang hoạt động</div>
+            <div id="adminStatActive" class="text-2xl font-black text-emerald-400 mt-1">3</div>
+          </div>
+        </div>
+
+        <!-- Modern Data Table -->
+        <div class="glass-panel rounded-3xl p-5 space-y-4">
+          <div class="flex items-center justify-between border-b border-white/10 pb-3">
+            <div>
+              <h3 class="text-sm font-bold text-white">Danh Sách Học Sinh & Phân Quyền</h3>
+              <p class="text-xs text-slate-400">Quản lý trạng thái và quyền truy cập vào các module lớp</p>
+            </div>
+            <button onclick="promptAddMember()" class="px-3.5 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold hover:bg-emerald-500/30 flex items-center gap-1.5">
+              <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> Thêm Mới
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="text-slate-400 uppercase font-bold border-b border-white/10 bg-white/5">
+                <tr>
+                  <th class="px-4 py-3 rounded-l-xl">Họ Và Tên</th>
+                  <th class="px-4 py-3">Email</th>
+                  <th class="px-4 py-3">Vai Trò</th>
+                  <th class="px-4 py-3">XP Tích Lũy</th>
+                  <th class="px-4 py-3">Trạng Thái</th>
+                  <th class="px-4 py-3 text-right rounded-r-xl">Hành Động</th>
+                </tr>
+              </thead>
+              <tbody id="memberTableBody" class="divide-y divide-white/5">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- SECTION 5: PERSONALIZATION (CÁ NHÂN HÓA GIAO DIỆN)       -->
+      <!-- ======================================================== -->
+      <section id="tab-settings" class="tab-pane hidden space-y-5">
+        
+        <div class="glass-panel p-6 sm:p-8 rounded-3xl max-w-2xl mx-auto space-y-6">
+          <div class="border-b border-white/10 pb-4">
+            <h3 class="text-base font-bold text-white">Cá Nhân Hóa Không Gian Học Tập</h3>
+            <p class="text-xs text-slate-400">Thay đổi tên lớp, avatar và bảng màu giao diện Saas</p>
+          </div>
+
+          <!-- Color palettes -->
+          <div class="space-y-2">
+            <label class="text-xs font-bold uppercase text-slate-300">Bảng màu giao diện:</label>
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+              <button onclick="changePalette('default')" class="p-2.5 rounded-xl border border-sky-400 bg-sky-500/10 text-sky-300 text-xs font-bold flex items-center justify-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span> Cyber Sky
+              </button>
+              <button onclick="changePalette('theme-aurora')" class="p-2.5 rounded-xl border border-purple-400 bg-purple-500/10 text-purple-300 text-xs font-bold flex items-center justify-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-purple-400"></span> Aurora
+              </button>
+              <button onclick="changePalette('theme-sunset')" class="p-2.5 rounded-xl border border-orange-400 bg-orange-500/10 text-orange-300 text-xs font-bold flex items-center justify-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-orange-400"></span> Sunset
+              </button>
+              <button onclick="changePalette('theme-emerald')" class="p-2.5 rounded-xl border border-emerald-400 bg-emerald-500/10 text-emerald-300 text-xs font-bold flex items-center justify-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Emerald
+              </button>
+              <button onclick="changePalette('theme-rose')" class="p-2.5 rounded-xl border border-rose-400 bg-rose-500/10 text-rose-300 text-xs font-bold flex items-center justify-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span> Rose Pink
+              </button>
+            </div>
+          </div>
+
+          <!-- Identity Inputs -->
+          <div class="space-y-3 pt-2">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Tên lớp học:</label>
+              <input type="text" id="settingClassNameInput" class="w-full px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-white">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Ký tự Avatar (tối đa 4 ký tự):</label>
+              <input type="text" id="settingAvatarInput" maxlength="4" class="w-full px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-white">
+            </div>
+            <div class="flex justify-end pt-3">
+              <button onclick="saveIdentitySettings()" class="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shadow-md">
+                Lưu Thay Đổi
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- ================= MODAL: 50/50 FAST AI CODE PARSER DRAWER ================= -->
+  <div id="fastCodeModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-3 sm:p-5">
+    <div class="glass-panel rounded-3xl max-w-5xl w-full border border-white/15 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden bg-slate-900">
+      
+      <!-- Modal Header -->
+      <div class="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="p-2 rounded-xl bg-amber-500/20 text-amber-400">
+            <i data-lucide="code-xml" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-sm sm:text-base font-bold text-white">Nhập Đề Bằng Mã Code & Kèm Ảnh</h3>
+            <p class="text-[11px] text-slate-400">Bóc tách đề trắc nghiệm trực tiếp từ AI hoặc văn bản theo thời gian thực</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="copySampleAiPrompt()" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 border border-white/10 flex items-center gap-1.5">
+            <i data-lucide="bot" class="w-3.5 h-3.5 text-brand-400"></i>
+            <span class="hidden sm:inline">Xuất Prompt Mẫu Cho AI</span>
+          </button>
+          <button onclick="closeFastImportModal()" class="p-1.5 text-slate-400 hover:text-white rounded-lg">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 50/50 Body -->
+      <div class="flex-1 overflow-y-auto p-4 sm:p-5 grid grid-cols-1 lg:grid-cols-2 gap-5">
+        
+        <!-- Left 50%: Editor -->
+        <div class="flex flex-col space-y-3">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-400 mb-1">Tên bộ đề</label>
+              <input type="text" id="modalBatchTitle" placeholder="Ví dụ: Ôn Tập Đồ Thị Hàm Số..." class="w-full px-3 py-1.5 text-xs rounded-xl bg-white/5 border border-white/10 text-white">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-400 mb-1">Môn học</label>
+              <select id="modalBatchSubject" class="w-full px-3 py-1.5 text-xs rounded-xl bg-white/5 border border-white/10 text-white">
+                <option value="Toán Học" class="bg-slate-900">Toán Học</option>
+                <option value="Vật Lý" class="bg-slate-900">Vật Lý</option>
+                <option value="Hóa Học" class="bg-slate-900">Hóa Học</option>
+                <option value="Tiếng Anh" class="bg-slate-900">Tiếng Anh</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between text-xs pt-1">
+            <span class="font-bold text-slate-300">Khung Mã Code:</span>
+            <div class="flex items-center gap-2">
+              <button onclick="insertSampleCodeSnippet()" class="text-[11px] text-brand-400 font-bold hover:underline">Tải Mẫu Đề Kèm Ảnh</button>
+              <span class="text-slate-600">|</span>
+              <button onclick="document.getElementById('modalBatchCode').value = ''; parseModalCodeRealtime();" class="text-[11px] text-rose-400 font-bold hover:underline">Xóa Trắng</button>
+            </div>
+          </div>
+
+          <textarea id="modalBatchCode" oninput="parseModalCodeRealtime()" rows="12" placeholder="Dán văn bản đề thi tại đây...&#10;&#10;Câu 1: Đường cong hình bên là đồ thị hàm số nào?&#10;A. y = x³ - 3x&#10;B. y = -x³ + 3x*&#10;C. y = x⁴ - 1&#10;D. y = (x+1)/(x-1)&#10;[IMG: https://link_anh_minh_hoa...]&#10;[GIẢI THÍCH]: Nhánh phải đi xuống nên a < 0..." class="w-full flex-1 p-3 font-mono text-xs rounded-2xl bg-black/40 border border-white/10 text-emerald-400 focus:outline-none focus:border-brand-400 min-h-[200px]"></textarea>
+
+          <div class="text-[10px] text-slate-400 bg-white/5 p-2 rounded-xl">
+            💡 Dấu <code>*</code> hoặc <code>[x]</code> sau phương án để chọn đáp án đúng. Thêm <code>[IMG: url]</code> để chèn hình.
+          </div>
+        </div>
+
+        <!-- Right 50%: Live Parser Preview -->
+        <div class="flex flex-col space-y-2 bg-white/[0.02] p-3 rounded-2xl border border-white/10">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2">
+            <span class="text-xs font-bold text-brand-400 uppercase">Xem Trước Trực Quan</span>
+            <span id="modalParsedCount" class="text-[11px] font-mono font-bold bg-brand-500/20 text-brand-300 px-2 py-0.5 rounded">0 câu hỏi</span>
+          </div>
+
+          <div id="modalParsedList" class="flex-1 overflow-y-auto space-y-3 max-h-[380px] pr-1">
+            <!-- Realtime parsed elements -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 border-t border-white/10 flex items-center justify-between bg-slate-900/90">
+        <span class="text-xs text-slate-400">Kiểm tra kỹ trước khi thêm vào kho</span>
+        <div class="flex items-center gap-2">
+          <button onclick="closeFastImportModal()" class="px-4 py-2 rounded-xl bg-white/10 text-xs font-bold text-slate-300 hover:bg-white/15">Đóng</button>
+          <button onclick="commitBatchImport()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 text-white font-extrabold text-xs shadow-md flex items-center gap-1.5">
+            <i data-lucide="check" class="w-4 h-4"></i> Xác Nhận Nhập Đề
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= IMAGE ZOOM MODAL LIGHTBOX ================= -->
+  <div id="zoomModal" class="fixed inset-0 z-50 bg-black/90 hidden flex items-center justify-center p-4" onclick="closeImgZoom()">
+    <div class="relative max-w-4xl max-h-[90vh]" onclick="event.stopPropagation()">
+      <img id="zoomImgTag" src="" alt="Zoomed" class="max-w-full max-h-[85vh] rounded-2xl border border-white/20 shadow-2xl object-contain">
+      <button onclick="closeImgZoom()" class="absolute -top-10 right-0 p-2 text-white bg-white/10 hover:bg-white/20 rounded-full">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= AUTH SWITCH MODAL ================= -->
+  <div id="authSwitchModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-panel rounded-3xl max-w-sm w-full border border-white/15 shadow-2xl p-6 space-y-4 bg-slate-900">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <h4 class="text-sm font-bold text-white">Chuyển Đổi Tài Khoản</h4>
+        <button onclick="closeAuthModal()" class="p-1 text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <div class="space-y-2">
+        <button onclick="switchUserRole('admin')" class="w-full p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-left flex items-center justify-between transition">
+          <div>
+            <div class="text-xs font-bold text-white">Thầy Hùng (Chủ sở hữu)</div>
+            <div class="text-[10px] text-amber-400 font-semibold">Quyền Quản Trị Viên (Owner)</div>
+          </div>
+          <i data-lucide="shield-check" class="w-4 h-4 text-amber-400"></i>
+        </button>
+
+        <button onclick="switchUserRole('student')" class="w-full p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-left flex items-center justify-between transition">
+          <div>
+            <div class="text-xs font-bold text-white">Học sinh Nguyễn An</div>
+            <div class="text-[10px] text-emerald-400 font-semibold">Quyền Học Sinh (Student)</div>
+          </div>
+          <i data-lucide="user" class="w-4 h-4 text-emerald-400"></i>
+        </button>
+      </div>
+
+      <div class="text-[10px] text-slate-500 pt-2 border-t border-white/10 text-center">
+        Tài khoản học sinh sẽ bị ẩn nút quản trị và phân quyền lớp.
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TOAST POPUP ================= -->
+  <div id="toastNotification" class="fixed bottom-5 right-5 z-50 glass-panel px-4 py-2.5 rounded-2xl shadow-xl flex items-center gap-2.5 text-xs font-bold text-white transition-all duration-300 transform translate-y-16 opacity-0 pointer-events-none border border-brand-400/50 bg-slate-900">
+    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+    <span id="toastMsgText">Thông báo hệ thống</span>
+  </div>
+
+  <!-- ================= APPLICATION CODE SCRIPT ================= -->
+  <script>
+    /* --------------------------------------------------------
+       1. DATA STORAGE & INITIAL STATE
+    -------------------------------------------------------- */
+    const INIT_CONFIG = {
+      className: "Lớp 12A1 Chuyên",
+      avatarText: "12A",
+      palette: "default",
+      isDark: true,
+      audio: true
+    };
+
+    const INIT_USERS = [
+      { id: "u-1", name: "Thầy Hùng", email: "admin@classhub.edu", role: "owner", xp: 1250, streak: 12, status: "active" },
+      { id: "u-2", name: "Nguyễn An", email: "student@classhub.edu", role: "student", xp: 620, streak: 7, status: "active" },
+      { id: "u-3", name: "Trần Minh Thư", email: "thu.tran@classhub.edu", role: "student", xp: 850, streak: 9, status: "active" }
+    ];
+
+    const INIT_SETS = [
+      {
+        id: "s-1",
+        title: "Hình Học Không Gian & Bảng Biến Thiên 12",
+        subject: "Toán Học",
+        desc: "Đồ thị hàm số bậc ba, cực trị và bảng biến thiên kèm hình minh họa.",
+        questions: [
+          {
+            q: "Cho bảng biến thiên của hàm số như trong hình. Hàm số đã cho đồng biến trên khoảng nào?",
+            image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600&auto=format&fit=crop&q=80",
+            options: ["( -∞ ; -1 )", "( -1 ; 1 )", "( 0 ; 2 )", "( 1 ; +∞ )"],
+            correct: 1,
+            explain: "Trên khoảng (-1; 1), đạo hàm y' mang dấu dương nên hàm số đồng biến."
+          },
+          {
+            q: "Đường cong trong hình vẽ là đồ thị của hàm số nào dưới đây?",
+            image: "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=600&auto=format&fit=crop&q=80",
+            options: ["y = -x³ + 3x + 1", "y = x³ - 3x + 1", "y = x⁴ - 2x² + 1", "y = (x+1)/(x-1)"],
+            correct: 0,
+            explain: "Nhánh phải đồ thị đi xuống suy ra hệ số a < 0 của hàm số bậc 3."
+          },
+          {
+            q: "Hàm số y = x⁴ - 2x² + 3 có bao nhiêu điểm cực trị?",
+            image: "",
+            options: ["1 điểm", "2 điểm", "3 điểm", "0 điểm"],
+            correct: 2,
+            explain: "Phương trình y' = 4x(x² - 1) = 0 có 3 nghiệm phân biệt tương ứng 3 cực trị."
+          }
+        ]
+      },
+      {
+        id: "s-2",
+        title: "Dao Động Cơ & Đồ Thị Pha Sóng",
+        subject: "Vật Lý",
+        desc: "Con lắc lò xo và xác định chu kỳ qua hình vẽ đồ thị pha sóng.",
+        questions: [
+          {
+            q: "Hình vẽ mô tả đồ thị dao động của một vật. Chu kỳ dao động T của vật là:",
+            image: "https://images.unsplash.com/photo-1507413245164-6160d8298b31?w=600&auto=format&fit=crop&q=80",
+            options: ["0.2 s", "0.4 s", "0.8 s", "1.2 s"],
+            correct: 1,
+            explain: "Thời gian vật thực hiện một chu kỳ hoàn chỉnh trên đồ thị là 0.4s."
+          }
+        ]
+      }
+    ];
+
+    const INIT_LEADERBOARD = [
+      { name: "Trần Minh Thư", score: "9.5", time: "05:14", date: "Hôm nay 14:20" },
+      { name: "Nguyễn An", score: "9.0", time: "06:40", date: "Hôm qua" },
+      { name: "Lê Quốc Bảo", score: "8.5", time: "07:10", date: "3 ngày trước" }
+    ];
+
+    const INIT_DOCS = [
+      { title: "Sổ Tay Toàn Tập Công Thức Giải Nhanh Toán 12", type: "PDF", subject: "Toán Học", url: "https://example.com" },
+      { title: "Bộ 25 Đề Thi Thử Vật Lý Chuẩn Cấu Trúc Kèm Lời Giải", type: "Drive", subject: "Vật Lý", url: "https://example.com" },
+      { title: "Tổng Ôn Từ Vựng & Ngữ Pháp Trọng Tâm Tiếng Anh THPT", type: "Slide", subject: "Tiếng Anh", url: "https://example.com" }
+    ];
+
+    let appConfig = JSON.parse(localStorage.getItem('ch_config')) || INIT_CONFIG;
+    let appUsers = JSON.parse(localStorage.getItem('ch_users')) || INIT_USERS;
+    let studySets = JSON.parse(localStorage.getItem('ch_sets')) || INIT_SETS;
+    let leaderboard = JSON.parse(localStorage.getItem('ch_lb')) || INIT_LEADERBOARD;
+    let vaultDocs = JSON.parse(localStorage.getItem('ch_docs')) || INIT_DOCS;
+    let currentUser = JSON.parse(localStorage.getItem('ch_current_user')) || appUsers[0];
+
+    // Navigation & View State
+    let currentTab = 'sets';
+    let currentBankView = 'grid'; // 'grid' | 'flashcard'
+    let currentActiveSub = 'all';
+    let activeFcSet = null;
+    let activeFcIndex = 0;
+    let parsedModalQuestions = [];
+
+    // Exam State
+    let examSession = {
+      active: false,
+      questions: [],
+      currentIndex: 0,
+      userAnswers: {},
+      flagged: new Set(),
+      timeLeft: 600,
+      duration: 600,
+      timerId: null
+    };
+
+    /* --------------------------------------------------------
+       2. WEB AUDIO SYSTEM (No external audio URLs)
+    -------------------------------------------------------- */
+    let audioContext = null;
+    function playAudio(type) {
+      if (!appConfig.audio) return;
+      try {
+        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioContext.state === 'suspended') audioContext.resume();
+        const now = audioContext.currentTime;
+
+        if (type === 'click') {
+          const osc = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          osc.frequency.setValueAtTime(600, now);
+          osc.frequency.exponentialRampToValueAtTime(300, now + 0.05);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+          osc.connect(gain); gain.connect(audioContext.destination);
+          osc.start(now); osc.stop(now + 0.05);
+        } else if (type === 'correct') {
+          const osc1 = audioContext.createOscillator();
+          const osc2 = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          osc1.frequency.setValueAtTime(523, now);
+          osc2.frequency.setValueAtTime(659, now + 0.08);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
+          osc1.connect(gain); osc2.connect(gain);
+          gain.connect(audioContext.destination);
+          osc1.start(now); osc1.stop(now + 0.1);
+          osc2.start(now + 0.08); osc2.stop(now + 0.22);
+        }
+      } catch(e) {}
+    }
+
+    function toggleAudio() {
+      appConfig.audio = !appConfig.audio;
+      localStorage.setItem('ch_config', JSON.stringify(appConfig));
+      const icon = document.getElementById('audioIcon');
+      icon.setAttribute('data-lucide', appConfig.audio ? 'volume-2' : 'volume-x');
+      lucide.createIcons();
+      showToast(appConfig.audio ? "Đã bật hiệu ứng âm thanh" : "Đã tắt âm thanh");
+    }
+
+    /* --------------------------------------------------------
+       3. LIFECYCLE & DOM INIT
+    -------------------------------------------------------- */
+    window.addEventListener('DOMContentLoaded', () => {
+      applyTheme();
+      updateAuthUI();
+      renderBankCards();
+      renderLeaderboard();
+      renderVaultDocs();
+      renderMembersTable();
+      updateStatsCounters();
+      lucide.createIcons();
+    });
+
+    function applyTheme() {
+      document.getElementById('sideClassName').textContent = appConfig.className;
+      document.getElementById('sideAvatarBox').textContent = appConfig.avatarText;
+      document.getElementById('settingClassNameInput').value = appConfig.className;
+      document.getElementById('settingAvatarInput').value = appConfig.avatarText;
+
+      document.body.className = document.body.className.replace(/theme-\w+/g, '').trim();
+      if (appConfig.palette && appConfig.palette !== 'default') {
+        document.body.classList.add(appConfig.palette);
+      }
+
+      if (appConfig.isDark) {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+      }
+    }
+
+    function toggleDarkMode() {
+      appConfig.isDark = !appConfig.isDark;
+      localStorage.setItem('ch_config', JSON.stringify(appConfig));
+      applyTheme();
+      playAudio('click');
+    }
+
+    function changePalette(pal) {
+      appConfig.palette = pal;
+      localStorage.setItem('ch_config', JSON.stringify(appConfig));
+      applyTheme();
+      playAudio('click');
+      showToast("Đã đổi bảng màu giao diện!");
+    }
+
+    function saveIdentitySettings() {
+      appConfig.className = document.getElementById('settingClassNameInput').value.trim() || appConfig.className;
+      appConfig.avatarText = document.getElementById('settingAvatarInput').value.trim() || appConfig.avatarText;
+      localStorage.setItem('ch_config', JSON.stringify(appConfig));
+      applyTheme();
+      playAudio('click');
+      showToast("Đã lưu thiết lập tên & avatar lớp!");
+    }
+
+    /* --------------------------------------------------------
+       4. AUTH & ROLE-BASED ACCESS CONTROL (RBAC)
+    -------------------------------------------------------- */
+    function updateAuthUI() {
+      const isOwner = currentUser.role === 'owner' || currentUser.role === 'admin';
+      document.getElementById('userAvatarPill').textContent = currentUser.name.charAt(0);
+      document.getElementById('userNamePill').textContent = currentUser.name;
+      document.getElementById('userRolePill').textContent = currentUser.role === 'owner' ? 'Chủ sở hữu' : 'Học sinh';
+      document.getElementById('userStreakCount').textContent = `${currentUser.streak || 7} ngày`;
+      document.getElementById('userXpTotal').textContent = `${currentUser.xp || 1250} XP`;
+
+      // Restrict Admin Tab on Sidebar
+      const adminTab = document.getElementById('sideAdminTab');
+      const uploadDocBtn = document.getElementById('btnUploadVaultDoc');
+      if (adminTab) adminTab.style.display = isOwner ? 'flex' : 'none';
+      if (uploadDocBtn) uploadDocBtn.style.display = isOwner ? 'flex' : 'none';
+    }
+
+    function openAuthModal() {
+      playAudio('click');
+      document.getElementById('authSwitchModal').classList.remove('hidden');
+    }
+
+    function closeAuthModal() {
+      document.getElementById('authSwitchModal').classList.add('hidden');
+    }
+
+    function switchUserRole(role) {
+      playAudio('click');
+      if (role === 'admin') {
+        currentUser = appUsers.find(u => u.role === 'owner') || appUsers[0];
+      } else {
+        currentUser = appUsers.find(u => u.role === 'student') || appUsers[1];
+      }
+      localStorage.setItem('ch_current_user', JSON.stringify(currentUser));
+      updateAuthUI();
+      closeAuthModal();
+      if (currentTab === 'members' && currentUser.role === 'student') {
+        switchTab('sets');
+      }
+      showToast(`Đã chuyển sang tài khoản: ${currentUser.name}`);
+    }
+
+    /* --------------------------------------------------------
+       5. SIDEBAR & NAVIGATION CONTROLLER
+    -------------------------------------------------------- */
+    function toggleSidebar() {
+      const sb = document.getElementById('sidebar');
+      const ov = document.getElementById('sidebarOverlay');
+      sb.classList.toggle('-translate-x-full');
+      ov.classList.toggle('hidden');
+    }
+
+    function switchTab(tId) {
+      playAudio('click');
+      currentTab = tId;
+
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+      const active = document.getElementById(`tab-${tId}`);
+      if (active) active.classList.remove('hidden');
+
+      document.querySelectorAll('.sidebar-tab').forEach(b => {
+        const isMatch = b.dataset.tab === tId;
+        b.className = isMatch
+          ? "sidebar-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold bg-brand-500 text-white shadow-md shadow-brand-glow"
+          : "sidebar-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition";
+      });
+
+      // Update breadcrumb
+      const names = {
+        sets: "Ngân Hàng Đề & Thẻ",
+        exam: "Đấu Trường Thi Thử",
+        vault: "Kho Tài Liệu Lớp",
+        members: "Quản Trị Lớp Học",
+        settings: "Cá Nhân Hóa"
+      };
+      document.getElementById('breadcrumbCurrent').textContent = names[tId] || "Không gian";
+
+      // Close mobile sidebar if open
+      const sb = document.getElementById('sidebar');
+      if (!sb.classList.contains('-translate-x-full') && window.innerWidth < 768) {
+        toggleSidebar();
+      }
+
+      lucide.createIcons();
+    }
+
+    /* --------------------------------------------------------
+       6. SECTION 1: QUESTION BANK & FLASHCARD 3D
+    -------------------------------------------------------- */
+    function filterBySubject(sub) {
+      playAudio('click');
+      currentActiveSub = sub;
+      document.querySelectorAll('.sub-pill').forEach(p => {
+        const isSel = p.dataset.sub === sub;
+        p.className = isSel
+          ? "sub-pill px-3 py-1.5 rounded-xl text-xs font-bold bg-brand-500 text-white"
+          : "sub-pill px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/5 text-slate-300 hover:bg-white/10";
+      });
+      renderBankCards();
+    }
+
+    function setBankView(viewMode) {
+      playAudio('click');
+      currentBankView = viewMode;
+      const isGrid = viewMode === 'grid';
+      document.getElementById('bankGridView').classList.toggle('hidden', !isGrid);
+      document.getElementById('bankFcView').classList.toggle('hidden', isGrid);
+
+      document.getElementById('viewBtnGrid').className = isGrid ? 'p-1.5 rounded-lg text-white bg-white/10' : 'p-1.5 rounded-lg hover:text-white';
+      document.getElementById('viewBtnFc').className = !isGrid ? 'p-1.5 rounded-lg text-white bg-white/10' : 'p-1.5 rounded-lg hover:text-white';
+
+      if (!isGrid && !activeFcSet && studySets.length > 0) {
+        openSetInFlashcard(studySets[0].id);
+      }
+    }
+
+    function renderBankCards() {
+      const container = document.getElementById('bankGridView');
+      const kw = (document.getElementById('bankSearchInput')?.value || '').toLowerCase();
+
+      const filtered = studySets.filter(s => {
+        const mSub = currentActiveSub === 'all' || s.subject === currentActiveSub;
+        const mKey = s.title.toLowerCase().includes(kw) || s.desc.toLowerCase().includes(kw);
+        return mSub && mKey;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full py-12 text-center text-slate-400 glass-panel rounded-3xl">
+            <i data-lucide="folder-search" class="w-10 h-10 mx-auto stroke-1 mb-2"></i>
+            <p class="text-xs">Không tìm thấy bộ đề phù hợp.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = filtered.map(s => {
+        const imgCount = s.questions.filter(q => !!q.image).length;
+        return `
+          <div class="glass-panel rounded-3xl p-5 flex flex-col justify-between space-y-4 hover:border-brand-400/50 transition">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-md bg-brand-500/20 text-brand-300 border border-brand-500/30">
+                  ${s.subject}
+                </span>
+                ${imgCount > 0 ? `
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 flex items-center gap-1">
+                    <i data-lucide="image" class="w-3 h-3"></i> ${imgCount} ảnh
+                  </span>
+                ` : ''}
+              </div>
+
+              <div>
+                <h4 class="text-sm font-bold text-white line-clamp-2">${s.title}</h4>
+                <p class="text-xs text-slate-400 mt-1 line-clamp-2">${s.desc}</p>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-white/10 flex items-center justify-between">
+              <span class="text-xs text-slate-400 font-mono">${s.questions.length} câu</span>
+              <button onclick="openSetInFlashcard('${s.id}')" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm hover:opacity-95">
+                <i data-lucide="layers" class="w-3.5 h-3.5"></i> Học Thẻ 3D
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    function openSetInFlashcard(setId) {
+      const set = studySets.find(s => s.id === setId);
+      if (!set) return;
+
+      activeFcSet = set;
+      activeFcIndex = 0;
+      setBankView('flashcard');
+
+      document.getElementById('fcActiveSetTitle').textContent = set.title;
+      document.getElementById('fcActiveSubjectTag').textContent = set.subject;
+      renderActiveCard();
+    }
+
+    function renderActiveCard() {
+      if (!activeFcSet) return;
+      const q = activeFcSet.questions[activeFcIndex];
+      const box = document.getElementById('fcBoxInner');
+      box.classList.remove('flipped');
+
+      document.getElementById('fcCounterBadge').textContent = `${activeFcIndex + 1} / ${activeFcSet.questions.length}`;
+      document.getElementById('fcBoxQuestion').textContent = q.q;
+      document.getElementById('fcBoxCorrectChar').textContent = String.fromCharCode(65 + q.correct);
+      document.getElementById('fcBoxCorrectText').textContent = q.options[q.correct];
+      document.getElementById('fcBoxExplain').textContent = q.explain || "Lời giải chi tiết.";
+
+      const imgWrap = document.getElementById('fcBoxImageWrapper');
+      const imgTag = document.getElementById('fcBoxImage');
+      if (q.image) {
+        imgTag.src = q.image;
+        imgWrap.classList.remove('hidden');
+      } else {
+        imgWrap.classList.add('hidden');
+      }
+    }
+
+    function flipActiveCard() {
+      playAudio('click');
+      document.getElementById('fcBoxInner').classList.toggle('flipped');
+    }
+
+    function nextActiveCard() {
+      playAudio('click');
+      if (activeFcSet && activeFcIndex < activeFcSet.questions.length - 1) {
+        activeFcIndex++;
+        renderActiveCard();
+      }
+    }
+
+    function prevActiveCard() {
+      playAudio('click');
+      if (activeFcSet && activeFcIndex > 0) {
+        activeFcIndex--;
+        renderActiveCard();
+      }
+    }
+
+    function markActiveMastered() {
+      playAudio('correct');
+      showToast("+20 XP đã thuộc thẻ!");
+      nextActiveCard();
+    }
+
+    /* --------------------------------------------------------
+       7. SECTION 2: LIVE MOCK EXAM ARENA
+    -------------------------------------------------------- */
+    function renderLeaderboard() {
+      const container = document.getElementById('examLeaderboardList');
+      if (!container) return;
+
+      container.innerHTML = leaderboard.map((row, idx) => `
+        <div class="p-2.5 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2.5">
+            <span class="w-6 h-6 rounded-lg font-bold flex items-center justify-center ${idx === 0 ? 'bg-amber-500/20 text-amber-300' : (idx === 1 ? 'bg-slate-300/20 text-slate-200' : 'bg-white/10 text-slate-400')}">
+              ${idx + 1}
+            </span>
+            <div>
+              <div class="font-bold text-white">${row.name}</div>
+              <div class="text-[10px] text-slate-400 font-mono">${row.time} • ${row.date}</div>
+            </div>
+          </div>
+          <span class="text-sm font-black text-brand-400 font-mono">${row.score}</span>
+        </div>
+      `).join('');
+    }
+
+    function launchExam(mins) {
+      playAudio('click');
+      let pool = [];
+      studySets.forEach(s => {
+        s.questions.forEach(q => pool.push({ ...q, subject: s.subject }));
+      });
+
+      if (pool.length < 2) {
+        showToast("Cần ít nhất 2 câu hỏi để mở phòng thi!");
+        return;
+      }
+
+      pool.sort(() => Math.random() - 0.5);
+      const chosen = pool.slice(0, mins === 5 ? 5 : 10);
+
+      examSession = {
+        active: true,
+        questions: chosen,
+        currentIndex: 0,
+        userAnswers: {},
+        flagged: new Set(),
+        timeLeft: mins * 60,
+        duration: mins * 60,
+        timerId: null
+      };
+
+      document.getElementById('examLobbyView').classList.add('hidden');
+      document.getElementById('examScoreView').classList.add('hidden');
+      document.getElementById('examRoomView').classList.remove('hidden');
+
+      renderExamQ();
+      renderExamMatrix();
+      startExamClock();
+      lucide.createIcons();
+    }
+
+    function startExamClock() {
+      if (examSession.timerId) clearInterval(examSession.timerId);
+      const tick = () => {
+        const m = Math.floor(examSession.timeLeft / 60);
+        const s = examSession.timeLeft % 60;
+        document.getElementById('examCountdown').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      };
+      tick();
+      examSession.timerId = setInterval(() => {
+        examSession.timeLeft--;
+        tick();
+        if (examSession.timeLeft <= 0) {
+          clearInterval(examSession.timerId);
+          completeExam();
+        }
+      }, 1000);
+    }
+
+    function renderExamQ() {
+      const q = examSession.questions[examSession.currentIndex];
+      const idx = examSession.currentIndex;
+      const total = examSession.questions.length;
+
+      document.getElementById('examQCurrentTag').textContent = `Câu hỏi ${idx + 1} / ${total} • ${q.subject || 'Tổng hợp'}`;
+      document.getElementById('examQText').textContent = q.q;
+
+      // Image
+      const imgWrap = document.getElementById('examQImageWrap');
+      const imgTag = document.getElementById('examQImage');
+      if (q.image) {
+        imgTag.src = q.image;
+        imgWrap.classList.remove('hidden');
+      } else {
+        imgWrap.classList.add('hidden');
+      }
+
+      // Options
+      const userPick = examSession.userAnswers[idx];
+      document.getElementById('examQOptions').innerHTML = q.options.map((opt, i) => {
+        const isSel = userPick === i;
+        return `
+          <button onclick="pickExamChoice(${i})" class="w-full text-left p-3 rounded-2xl border transition flex items-center justify-between text-xs ${isSel ? 'border-brand-400 bg-brand-500/20 text-white font-bold' : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'}">
+            <div class="flex items-center gap-2.5">
+              <span class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-xs ${isSel ? 'bg-brand-500 text-white' : 'bg-white/10 text-slate-300'}">${String.fromCharCode(65 + i)}</span>
+              <span>${opt}</span>
+            </div>
+            ${isSel ? '<i data-lucide="check" class="w-4 h-4 text-brand-400"></i>' : ''}
+          </button>
+        `;
+      }).join('');
+
+      renderExamMatrix();
+      lucide.createIcons();
+    }
+
+    function pickExamChoice(cIdx) {
+      playAudio('click');
+      examSession.userAnswers[examSession.currentIndex] = cIdx;
+      renderExamQ();
+    }
+
+    function toggleFlagCurrent() {
+      playAudio('click');
+      const idx = examSession.currentIndex;
+      if (examSession.flagged.has(idx)) examSession.flagged.delete(idx);
+      else examSession.flagged.add(idx);
+      renderExamMatrix();
+    }
+
+    function nextExamQ() {
+      playAudio('click');
+      if (examSession.currentIndex < examSession.questions.length - 1) {
+        examSession.currentIndex++;
+        renderExamQ();
+      }
+    }
+
+    function prevExamQ() {
+      playAudio('click');
+      if (examSession.currentIndex > 0) {
+        examSession.currentIndex--;
+        renderExamQ();
+      }
+    }
+
+    function renderExamMatrix() {
+      const grid = document.getElementById('examPaletteGrid');
+      const totalAns = Object.keys(examSession.userAnswers).length;
+      document.getElementById('examQAnsweredCount').textContent = `${totalAns}/${examSession.questions.length} đã làm`;
+
+      grid.innerHTML = examSession.questions.map((_, i) => {
+        const isCur = examSession.currentIndex === i;
+        const isDone = examSession.userAnswers.hasOwnProperty(i);
+        const isFlag = examSession.flagged.has(i);
+
+        let cls = "border-white/10 bg-white/5 text-slate-400";
+        if (isDone) cls = "bg-brand-500 text-white font-bold";
+        if (isFlag) cls = "bg-amber-400 text-slate-950 font-bold";
+        if (isCur) cls += " ring-2 ring-white";
+
+        return `
+          <button onclick="examSession.currentIndex = ${i}; renderExamQ();" class="h-8 rounded-lg border text-xs flex items-center justify-center transition ${cls}">
+            ${i + 1}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function submitExamPrompt() {
+      completeExam();
+    }
+
+    function completeExam() {
+      if (examSession.timerId) clearInterval(examSession.timerId);
+      examSession.active = false;
+
+      let correct = 0;
+      examSession.questions.forEach((q, idx) => {
+        if (examSession.userAnswers[idx] === q.correct) correct++;
+      });
+
+      const total = examSession.questions.length;
+      const score = ((correct / total) * 10).toFixed(1);
+      const spent = examSession.duration - examSession.timeLeft;
+      const m = Math.floor(spent / 60);
+      const s = spent % 60;
+      const timeStr = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+      document.getElementById('examRoomView').classList.add('hidden');
+      document.getElementById('examScoreView').classList.remove('hidden');
+
+      document.getElementById('scoreValue').textContent = `${score}/10`;
+      document.getElementById('scoreCorrect').textContent = `${correct}/${total}`;
+      document.getElementById('scoreTime').textContent = timeStr;
+
+      leaderboard.unshift({
+        name: currentUser.name,
+        score: score,
+        time: timeStr,
+        date: "Vừa xong"
+      });
+      localStorage.setItem('ch_lb', JSON.stringify(leaderboard));
+      renderLeaderboard();
+
+      confetti({ particleCount: 75, spread: 70 });
+      playAudio('correct');
+    }
+
+    function exitExamToLobby() {
+      document.getElementById('examScoreView').classList.add('hidden');
+      document.getElementById('examRoomView').classList.add('hidden');
+      document.getElementById('examLobbyView').classList.remove('hidden');
+    }
+
+    /* --------------------------------------------------------
+       8. SECTION 3: VAULT & SECTION 4: MEMBERS
+    -------------------------------------------------------- */
+    function renderVaultDocs() {
+      const container = document.getElementById('vaultGrid');
+      const kw = (document.getElementById('docSearchInput')?.value || '').toLowerCase();
+      const filtered = vaultDocs.filter(d => d.title.toLowerCase().includes(kw) || d.subject.toLowerCase().includes(kw));
+
+      container.innerHTML = filtered.map(d => `
+        <div class="glass-panel rounded-3xl p-5 flex flex-col justify-between space-y-3">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-500/20 text-brand-300">${d.type}</span>
+              <span class="text-xs text-slate-400">${d.subject}</span>
+            </div>
+            <h4 class="text-xs sm:text-sm font-bold text-white line-clamp-2">${d.title}</h4>
+          </div>
+          <div class="pt-3 border-t border-white/10 flex justify-end">
+            <a href="${d.url}" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold transition flex items-center gap-1.5">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i> Tải Về
+            </a>
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function openUploadDocPrompt() {
+      const title = prompt("Nhập tiêu đề tài liệu mới:");
+      if (!title) return;
+      const sub = prompt("Nhập môn học (Toán Học, Vật Lý, v.v.):") || "Tổng hợp";
+      vaultDocs.unshift({
+        title: title,
+        type: "PDF",
+        subject: sub,
+        url: "https://example.com"
+      });
+      localStorage.setItem('ch_docs', JSON.stringify(vaultDocs));
+      renderVaultDocs();
+      showToast("Đã tải tài liệu lên kho!");
+    }
+
+    function renderMembersTable() {
+      const tbody = document.getElementById('memberTableBody');
+      if (!tbody) return;
+
+      tbody.innerHTML = appUsers.map(u => `
+        <tr class="hover:bg-white/5 transition text-xs">
+          <td class="px-4 py-3 font-bold text-white flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center font-bold text-xs">${u.name.charAt(0)}</span>
+            ${u.name}
+          </td>
+          <td class="px-4 py-3 text-slate-400 font-mono">${u.email}</td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.role === 'owner' ? 'bg-amber-500/20 text-amber-300' : 'bg-white/10 text-slate-300'}">
+              ${u.role.toUpperCase()}
+            </span>
+          </td>
+          <td class="px-4 py-3 font-mono text-emerald-400 font-bold">${u.xp} XP</td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">
+              ${u.status === 'active' ? 'Hoạt động' : 'Đã khóa'}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-right">
+            ${u.role !== 'owner' ? `
+              <button onclick="toggleMemberBan('${u.id}')" class="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-[11px]">
+                ${u.status === 'active' ? 'Khóa' : 'Mở'}
+              </button>
+            ` : '<span class="text-slate-500 text-[11px]">Chủ phòng</span>'}
+          </td>
+        </tr>
+      `).join('');
+
+      document.getElementById('adminStatMembers').textContent = appUsers.length;
+      document.getElementById('adminStatAdmins').textContent = appUsers.filter(u => u.role === 'owner' || u.role === 'admin').length;
+      document.getElementById('adminStatStudents').textContent = appUsers.filter(u => u.role === 'student').length;
+      document.getElementById('adminStatActive').textContent = appUsers.filter(u => u.status === 'active').length;
+    }
+
+    function toggleMemberBan(uid) {
+      const u = appUsers.find(x => x.id === uid);
+      if (u) {
+        u.status = u.status === 'active' ? 'banned' : 'active';
+        localStorage.setItem('ch_users', JSON.stringify(appUsers));
+        renderMembersTable();
+        showToast(`Đã cập nhật trạng thái của ${u.name}`);
+      }
+    }
+
+    function promptAddMember() {
+      const name = prompt("Họ và tên thành viên mới:");
+      if (!name) return;
+      const email = prompt("Email đăng nhập:") || `user_${Date.now()}@classhub.edu`;
+      appUsers.push({
+        id: "u-" + Date.now(),
+        name: name,
+        email: email,
+        role: "student",
+        xp: 0,
+        streak: 1,
+        status: "active"
+      });
+      localStorage.setItem('ch_users', JSON.stringify(appUsers));
+      renderMembersTable();
+      showToast(`Đã thêm thành viên ${name}!`);
+    }
+
+    /* --------------------------------------------------------
+       9. 50/50 MODAL: FAST AI CODE PARSER
+    -------------------------------------------------------- */
+    function openFastImportModal() {
+      playAudio('click');
+      document.getElementById('modalBatchTitle').value = '';
+      document.getElementById('modalBatchCode').value = '';
+      parsedModalQuestions = [];
+      updateModalPreviewUI();
+      document.getElementById('fastCodeModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeFastImportModal() {
+      document.getElementById('fastCodeModal').classList.add('hidden');
+    }
+
+    function copySampleAiPrompt() {
+      playAudio('click');
+      const samplePrompt = `Hãy giúp tôi xuất các câu hỏi trắc nghiệm sau sang định dạng chuẩn ClassHub kèm hình ảnh:
+
+Câu [Số]: [Nội dung câu hỏi]
+A. [Đáp án A]
+B. [Đáp án B]* (Gắn dấu * sau đáp án đúng)
+C. [Đáp án C]
+D. [Đáp án D]
+[IMG: https://link_anh_minh_hoa...]
+[GIẢI THÍCH]: [Lời giải ngắn gọn]`;
+
+      const el = document.createElement('textarea');
+      el.value = samplePrompt;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+
+      confetti({ particleCount: 30, spread: 50 });
+      showToast("Đã sao chép Prompt mẫu cho ChatGPT / Gemini!");
+    }
+
+    function insertSampleCodeSnippet() {
+      playAudio('click');
+      const snippet = `Câu 1: Đường cong trong hình bên là đồ thị của hàm số nào?
+A. y = -x³ + 3x + 1*
+B. y = x³ - 3x + 1
+C. y = x⁴ - 2x² + 1
+D. y = (x+1)/(x-1)
+[IMG: https://images.unsplash.com/photo-1509228468518-180dd4864904?w=600&auto=format&fit=crop&q=80]
+[GIẢI THÍCH]: Đồ thị hàm bậc ba có nhánh phải đi xuống nên a < 0.
+
+Câu 2: Hàm số y = x⁴ - 2x² + 3 có bao nhiêu điểm cực trị?
+A. 1 điểm
+B. 2 điểm
+C. 3 điểm*
+D. 0 điểm
+[GIẢI THÍCH]: y' = 4x(x²-1) = 0 có 3 nghiệm phân biệt.`;
+
+      document.getElementById('modalBatchCode').value = snippet;
+      document.getElementById('modalBatchTitle').value = "Đề Mẫu Ôn Tập Đồ Thị Có Hình";
+      parseModalCodeRealtime();
+    }
+
+    function parseModalCodeRealtime() {
+      const text = document.getElementById('modalBatchCode').value;
+      if (!text.trim()) {
+        parsedModalQuestions = [];
+        updateModalPreviewUI();
+        return;
+      }
+
+      const questions = [];
+      const blocks = text.split(/(?:^|\n+)(?=Câu\s*\d+[:.])/gi);
+
+      blocks.forEach(block => {
+        const trimmed = block.trim();
+        if (!trimmed) return;
+        const lines = trimmed.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+        let qText = "";
+        let options = [];
+        let correctIdx = 0;
+        let imgUrl = "";
+        let explain = "";
+
+        lines.forEach(line => {
+          if (/^Câu\s*\d+[:.]/i.test(line)) {
+            qText = line.replace(/^Câu\s*\d+[:.]\s*/i, '');
+          } else if (/^\[IMG:\s*(.*?)\]/i.test(line)) {
+            const m = line.match(/^\[IMG:\s*(.*?)\]/i);
+            if (m && m[1]) imgUrl = m[1].trim();
+          } else if (/^\[(?:GIẢI\s*THÍCH|EXPLAIN)\]\s*:\s*(.*)/i.test(line)) {
+            const m = line.match(/^\[(?:GIẢI\s*THÍCH|EXPLAIN)\]\s*:\s*(.*)/i);
+            if (m && m[1]) explain = m[1].trim();
+          } else if (/^[A-D][.:)]\s*/i.test(line)) {
+            let optClean = line.replace(/^[A-D][.:)]\s*/i, '');
+            let isCorrect = false;
+            if (optClean.includes('*')) {
+              isCorrect = true;
+              optClean = optClean.replace(/\*/g, '').trim();
+            } else if (/\[x\]/i.test(optClean)) {
+              isCorrect = true;
+              optClean = optClean.replace(/\[x\]/gi, '').trim();
+            }
+            options.push(optClean);
+            if (isCorrect) correctIdx = options.length - 1;
+          } else if (!qText) {
+            qText = line;
+          }
+        });
+
+        if (qText && options.length >= 2) {
+          questions.push({
+            q: qText,
+            options: options,
+            correct: correctIdx,
+            image: imgUrl,
+            explain: explain || "Chưa có lời giải."
+          });
+        }
+      });
+
+      parsedModalQuestions = questions;
+      updateModalPreviewUI();
+    }
+
+    function updateModalPreviewUI() {
+      const list = document.getElementById('modalParsedList');
+      const badge = document.getElementById('modalParsedCount');
+      badge.textContent = `${parsedModalQuestions.length} câu hỏi`;
+
+      if (parsedModalQuestions.length === 0) {
+        list.innerHTML = `
+          <div class="py-12 text-center text-slate-500 text-xs">
+            <i data-lucide="scan-line" class="w-8 h-8 mx-auto mb-1 stroke-1"></i>
+            Dán mã code hoặc nhấp 'Tải Mẫu Đề Kèm Ảnh' để xem trước
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      list.innerHTML = parsedModalQuestions.map((q, idx) => `
+        <div class="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-2 text-xs">
+          <div class="flex items-center justify-between text-brand-400 font-bold">
+            <span>Câu #${idx + 1}</span>
+            ${q.image ? '<span class="text-purple-400 text-[10px] flex items-center gap-1"><i data-lucide="image" class="w-3 h-3"></i> Kèm ảnh</span>' : ''}
+          </div>
+          <div class="text-white font-semibold">${q.q}</div>
+          ${q.image ? `
+            <img src="${q.image}" class="max-h-20 rounded-lg border border-white/10 object-contain cursor-pointer" onclick="zoomImg('${q.image}')">
+          ` : ''}
+          <div class="grid grid-cols-2 gap-1 pt-1">
+            ${q.options.map((opt, oIdx) => `
+              <div class="p-1 rounded text-[11px] ${oIdx === q.correct ? 'bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40' : 'bg-white/5 text-slate-400'}">
+                ${String.fromCharCode(65 + oIdx)}. ${opt}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function commitBatchImport() {
+      if (parsedModalQuestions.length === 0) {
+        showToast("Chưa có câu hỏi nào hợp lệ để nhập!");
+        return;
+      }
+
+      const title = document.getElementById('modalBatchTitle').value.trim() || `Bộ Đề Tổng Hợp (${new Date().toLocaleDateString('vi-VN')})`;
+      const subject = document.getElementById('modalBatchSubject').value;
+
+      const newSet = {
+        id: "s-" + Date.now(),
+        title: title,
+        subject: subject,
+        desc: `Bộ đề gồm ${parsedModalQuestions.length} câu hỏi được nhập tự động bằng mã code.`,
+        questions: parsedModalQuestions
+      };
+
+      studySets.unshift(newSet);
+      localStorage.setItem('ch_sets', JSON.stringify(studySets));
+
+      closeFastImportModal();
+      renderBankCards();
+      updateStatsCounters();
+
+      confetti({ particleCount: 60, spread: 70 });
+      playAudio('correct');
+      showToast(`Đã nhập thành công ${parsedModalQuestions.length} câu hỏi!`);
+    }
+
+    /* --------------------------------------------------------
+       10. UTILITIES: IMAGE ZOOM & STATS & TOAST
+    -------------------------------------------------------- */
+    function zoomImg(src) {
+      playAudio('click');
+      document.getElementById('zoomImgTag').src = src;
+      document.getElementById('zoomModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeImgZoom() {
+      document.getElementById('zoomModal').classList.add('hidden');
+    }
+
+    function updateStatsCounters() {
+      const sets = studySets.length;
+      let q = 0, img = 0;
+      studySets.forEach(s => {
+        q += s.questions.length;
+        img += s.questions.filter(x => !!x.image).length;
+      });
+
+      document.getElementById('bankStatSets').textContent = sets;
+      document.getElementById('bankStatQ').textContent = q;
+      document.getElementById('bankStatImg').textContent = img;
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastNotification');
+      document.getElementById('toastMsgText').textContent = msg;
+      toast.classList.remove('translate-y-16', 'opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        toast.classList.add('translate-y-16', 'opacity-0', 'pointer-events-none');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
